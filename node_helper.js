@@ -35,7 +35,7 @@ module.exports = NodeHelper.create({
                     }
                 };
                 let oauth2 = simpleOauth2.create(credentials);
-                let result = await oauth2.clientCredentials.getToken();
+                let result = oauth2.clientCredentials.getToken();
                 let accessToken = oauth2.accessToken.create(result);
                 resolve(accessToken);
             }
