@@ -1,0 +1,29 @@
+{
+    "name": "MMM-SHL",
+    "version": "1.0.0",
+    "description": "[Magic Mirror](https://magicmirror.builders/) Module - Display current SHL stands and filter out team stands. Getting data from [Open SHL API](http://doc.openapi.shl.se/)",
+    "main": "MMM-SHL.js",
+    "directories": {
+      "doc": "docs"
+    },
+    "scripts": {
+      "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "repository": {
+      "type": "git",
+      "url": "git+https://github.com/bureus/MMM-SHL.git"
+    },
+    "keywords": [],
+    "author": "bureus",
+    "license": "MIT",
+    "bugs": {
+      "url": "https://github.com/bureus/MMM-SHL/issues"
+    },
+    "homepage": "https://github.com/bureus/MMM-SHL#readme",
+    "dependencies": {
+      "request-promise": "^4.2.2",
+      "url": "^0.11.0",
+      "simple-oauth2": "^2.2.1",
+      "request": "^2.81.0"
+    }
+  }
