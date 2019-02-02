@@ -15,11 +15,11 @@ Module.register("MMM-SHL", {
         }
     },
 
-    getStyles: function () {
+    /*getStyles: function () {
         return [
             this.file('/css/mmm-shl-main.css')
         ]
-    },
+    },*/
 
     start: function () {
         Log.info("Starting module: " + this.name);
@@ -35,7 +35,7 @@ Module.register("MMM-SHL", {
         let wrapper = document.createElement("div");
         wrapper.className = "stands-board";
         if (!this.loaded && !this.failure) {
-            wrapper.innerHTML = "<img src='https://iof2.idrottonline.se/globalassets/svenska-ishockeyforbundet/logos/sif_logotyp_nyhet_800.jpg'></img>"
+            wrapper.innerHTML = "<img src='https://www.shl.se/sprites/img/shl1-shl-37e0d.png'></img>"
             return wrapper;
         }
         if (this.failure) {
@@ -45,7 +45,7 @@ Module.register("MMM-SHL", {
         }
         if (this.stands.length > 0) {
             let standsTable = this.generateStandsTable();
-            wrapper.appendChild(standsTable);
+            wrapper.innerHTML = standsTable;
             return wrapper;
         }
     },
@@ -58,43 +58,48 @@ Module.register("MMM-SHL", {
         th.className = 'align-left';
         row.appendChild(th);
         th = document.createElement("th");
+        th.className = 'align-left';
         row.appendChild(th);
         th = document.createElement("th");
+        th.className = 'align-left';
         row.appendChild(th);
         th = document.createElement("th");
+        th.className = 'align-left';
         th.innerText = "GP"
         row.appendChild(th);
         th = document.createElement("th");
+        th.className = 'align-left';
         th.innerText = "+/-"
         row.appendChild(th);
         th = document.createElement("th");
+        th.className = 'align-left';
         th.innerText = "P"
         row.appendChild(th);
         table.appendChild(row);
         for (let n = 0; n < this.stands.length; n++) {
             let team = this.stands[n];
             row = document.createElement("tr");
-            let th = document.createElement("th");
+            th = document.createElement("th");
             th.className = 'align-left';
             th.innerText =  team.rank;
             row.appendChild(th);
-            let th = document.createElement("th");
+            th = document.createElement("th");
             th.className = 'align-left';
             th.innerHTML =  "<img src='"+team.icon+"'></img>"
             row.appendChild(th);
-            let th = document.createElement("th");
+            th = document.createElement("th");
             th.className = 'align-left';
             th.innerText =  team.name;
             row.appendChild(th);
-            let th = document.createElement("th");
+            th = document.createElement("th");
             th.className = 'align-left';
             th.innerText =  team.gp;
             row.appendChild(th);
-            let th = document.createElement("th");
+            th = document.createElement("th");
             th.className = 'align-left';
             th.innerText =  team.diff;
             row.appendChild(th);
-            let th = document.createElement("th");
+            th = document.createElement("th");
             th.className = 'align-left';
             th.innerText =  team.points;
             row.appendChild(th);

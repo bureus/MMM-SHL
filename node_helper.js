@@ -1,16 +1,15 @@
 const NodeHelper = require("node_helper");
 const request = require("request-promise");
-const simpleOauth2 = require('simple-oauth2');
+const encode = require("nodejs-base64-encode");
 const baseUrl = 'https://openapi.shl.se';
 var Url = require("url");
-var debugMe = false;
+var debugMe = true;
 
 module.exports = NodeHelper.create({
     // --------------------------------------- Start the helper
     start: function () {
         log("Starting helper: " + this.name);
         this.started = false;
-        this.initiate();
     },
     // --------------------------------------- Schedule a stands update
     scheduleUpdate: function () {
@@ -23,27 +22,36 @@ module.exports = NodeHelper.create({
     getAccessToken: async function () {
         let self = this;
         return new Promise(resolve => {
-            try {
-                log("Getting access token");
-                let credentials = {
-                    client: {
-                        id: this.config.clientId,
-                        secret: this.config.clientSecret
-                    },
-                    auth: {
-                        tokenHost: baseUrl + '/oauth2/token'
+            let basicAuth = encode.encode(this.config.clientId + ":" + this.config.clientSecret, "base64")
+            let options = {
+                method: "POST",
+                uri: baseUrl + '/oauth2/token',
+                headers: {
+                    "Content-Type": "application/x-www-form-urlencoded",
+                    "Authorization": "Basic " + basicAuth,
+                },
+                body: "grant_type=client_credentials"
+            };
+
+            request(options)
+                .then(function (body) {
+                    let reply = JSON.parse(body);
+                    debug("access token response: "+body);
+                    self.accessToken = {
+                        token: reply.access_token,
+                        expires: reply.expires_in
                     }
-                };
-                let oauth2 = simpleOauth2.create(credentials);
-                let result = oauth2.clientCredentials.getToken();
-                let accessToken = oauth2.accessToken.create(result);
-                resolve(accessToken);
-            }
-            catch (e) {
-                logger.error('Access Token error', e.message);
-                reject();
-            }
+                    debug("generateAccessToken completed");
+                    resolve(true);
+                })
+                .catch(function (error) {
+                    log("generateAccessToken failed =" + error);
+                    self.sendSocketNotification("SERVICE_FAILURE", error);
+                    reject();
+                });
         });
+
+
     },
     // --------------------------------------- Get stands
     getStands: async function(){
@@ -52,21 +60,22 @@ module.exports = NodeHelper.create({
             if (self.accessToken) {
                 debug("Getting standings");
                 let currentDate = new Date(Date.now());
-                let year = currentDate.getMonth() > 5 ? currentDate.getFullYear() - 1 : currentDate.getFullYear();
+                let year = currentDate.getMonth() < 5 ? currentDate.getFullYear() - 1 : currentDate.getFullYear();
                 let options = {
                     method: "GET",
                     uri: baseUrl+"/seasons/"+year+"/statistics/teams/standings",
                     headers: {
-                        "Authorization": "Bearer " + self.accessToken.access_token,
+                        "Authorization": "Bearer " + self.accessToken.token,
                     },
                     json: true
                 };
     
                 request(options)
                     .then(function (response) {
-                        debug("Standings retrived");
-                        debug("Number of teams: " + response.length);
-                        resolve(response);
+                        debug("Standings retrived: "+JSON.stringify(response));
+                        let stands = response;
+                        debug("Number of teams: " + stands.length);
+                        resolve(stands);
                     })
                     .catch(function (error) {
                         log("getStands failed =" + error);
@@ -86,21 +95,22 @@ module.exports = NodeHelper.create({
             if (self.accessToken) {
                 debug("Getting standings");
                 let currentDate = new Date(Date.now());
-                let year = currentDate.getMonth() > 5 ? currentDate.getFullYear() - 1 : currentDate.getFullYear();
+                let year = currentDate.getMonth() < 5 ? currentDate.getFullYear() - 1 : currentDate.getFullYear();
                 let options = {
                     method: "GET",
                     uri: baseUrl+"/seasons/"+year+"/games",
                     headers: {
-                        "Authorization": "Bearer " + self.accessToken.access_token,
+                        "Authorization": "Bearer " + self.accessToken.token,
                     },
                     json: true
                 };
     
                 request(options)
                     .then(function (response) {
-                        debug("Games retrived");
-                        debug("Number of games: " + response.length);
-                        resolve(response);
+                        debug("Games retrived: "+JSON.stringify(response));
+                        let games = response;
+                        debug("Number of games: " + games.length);
+                        resolve(games);
                     })
                     .catch(function (error) {
                         log("getStands failed =" + error);
@@ -130,8 +140,10 @@ module.exports = NodeHelper.create({
               return null;
           }
     },
-    sendStand: function(){
-        let dto = generateDto();
+    sendStand: async function(){
+        let self = this;
+        let dto = await self.generateDto();
+        debug(JSON.stringify(dto));
         if(dto.length > 0 ){
             self.sendSocketNotification("STANDS", dto); // send teams stands back to app.
         }else{
@@ -143,13 +155,14 @@ module.exports = NodeHelper.create({
         let self = this;
         if(!self.accessToken){
             self.accessToken = await self.getAccessToken();
-            debug("Access token retrived: "+self.accessToken);
+            if(self.accessToken)
+                debug("Access token retrived: "+self.accessToken);
         }
 
         self.games = await self.getGames();
         self.stands = await self.getStands();
-        sendStand();
-        scheduleUpdate();
+        await self.sendStand();
+        self.scheduleUpdate();
     },
     // --------------------------------------- Create DTO
     generateDto: async function(){
@@ -157,16 +170,33 @@ module.exports = NodeHelper.create({
         let dto = [];
         self.stands.forEach(team => {
             if(team.team_code == "FHC" || team.team_code == "DIF"){
-                let teamContent = getTeamContent(team.team_code);
+                debug("Team is: "+team.team_code);
+                let teamContent = self.getTeamContent(team.team_code);
                 team.icon = teamContent.icon;
                 team.name = teamContent.name;
+                debug(JSON.stringify(team));
                 dto.push(team);
             }    
         });
-        return dto;
+        debug(JSON.stringify(dto));
+        let sortedStands = sortByKey(dto, "rank");
+        return sortedStands;
+    },
+     // --------------------------------------- Handle notifications
+     socketNotificationReceived: async function (notification, payload) {
+        const self = this;
+        log("socketNotificationReceived")
+        if (notification === "CONFIG") {
+            log("CONFIG event received")
+            this.config = payload;
+            this.started = true;
+            //debugMe = this.config.debug;
+            if (!self.accessToken) {
+                await self.getAccessToken(); // Get inital access token
+            }
+            self.initiate();
+        };
     }
-
-
 });
 
 //
