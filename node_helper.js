@@ -141,8 +141,9 @@ module.exports = NodeHelper.create({
     // --------------------------------------- Initiate
     initiate: async function(){
         let self = this;
-        if(self.accessToken){
+        if(!self.accessToken){
             self.accessToken = await self.getAccessToken();
+            debug("Access token retrived: "+self.accessToken);
         }
 
         self.games = await self.getGames();
