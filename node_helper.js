@@ -12,11 +12,12 @@ module.exports = NodeHelper.create({
         this.started = false;
     },
     // --------------------------------------- Schedule a stands update
-    scheduleUpdate: function () {
+    scheduleUpdate: function (refreshRate) {
         let self = this;
+        log("Sceduled refresh at: "+new Date(Date.now()+refreshRate));
         this.updatetimer = setInterval(function () { // This timer is saved in uitimer so that we can cancel it
             self.sendStand();
-        }, 3600000);
+        }, refreshRate);
     },
     // --------------------------------------- Get access token
     getAccessToken: async function () {
@@ -111,6 +112,8 @@ module.exports = NodeHelper.create({
                         let games = response;
                         debug("Number of games: " + games.length);
                         resolve(games);
+                        //gamesPerTeams = groupGamesPerTeam(games);
+                        //resolve(gamesPerTeams);
                     })
                     .catch(function (error) {
                         log("getStands failed =" + error);
@@ -150,19 +153,23 @@ module.exports = NodeHelper.create({
             self.sendSocketNotification("SERVICE_FAILURE", "Missing teams..");
         }
     },
-    // --------------------------------------- Initiate
-    initiate: async function(){
+    // --------------------------------------- update
+    update: async function(){
         let self = this;
+        if(this.updatetimer){
+            clearInterval(this.updatetimer); 
+        }
         if(!self.accessToken){
             self.accessToken = await self.getAccessToken();
             if(self.accessToken)
                 debug("Access token retrived: "+self.accessToken);
         }
-
         self.games = await self.getGames();
+        self.gamePerTeam = groupGamesPerTeam(self.games);
         self.stands = await self.getStands();
         await self.sendStand();
-        self.scheduleUpdate();
+        let timeToNextUpdate = getRefreshTime(sortOnUpcomingGame(new Date(Date.now()),(self.games))[0]);
+        self.scheduleUpdate(timeToNextUpdate);
     },
     // --------------------------------------- Create DTO
     generateDto: async function(){
@@ -174,6 +181,8 @@ module.exports = NodeHelper.create({
                 let teamContent = self.getTeamContent(team.team_code);
                 team.icon = teamContent.icon;
                 team.name = teamContent.name;
+                team.games = sortOnUpcomingGame(new Date(Date.now()), self.gamePerTeam[team.team_code]);
+                team.nextGame = team.games.length > 0 ? team.games[0] : null;
                 debug(JSON.stringify(team));
                 dto.push(team);
             }    
@@ -194,7 +203,7 @@ module.exports = NodeHelper.create({
             if (!self.accessToken) {
                 await self.getAccessToken(); // Get inital access token
             }
-            self.initiate();
+            self.update();
         };
     }
 });
@@ -208,6 +217,45 @@ function sortByKey(array, key) {
         return ((x < y) ? -1 : ((x > y) ? 1 : 0));
     });
 }
+
+function getRefreshTime(nextGame){
+    if(!nextGame){
+        return 3600000;
+    }
+    let estimatedEndTime = new Date(nextGame.start_date_time);
+    estimatedEndTime.setHours(estimatedEndTime.getHours()+2);
+    estimatedEndTime.setMinutes(estimatedEndTime.getMinutes()+45);
+    return estimatedEndTime - new Date(Date.now());
+}
+
+function sortOnUpcomingGame(date, array){
+    array.sort(function(a, b) {
+        var distancea = Math.abs(date - new Date(a.start_date_time));
+        var distanceb = Math.abs(date - new Date(b.start_date_time));
+        return distancea - distanceb; // sort a before b when the distance is smaller
+    });
+    let sorted = array.filter(function(d) {
+        return new Date(d.start_date_time) - date > 0;
+    });
+    return sorted;
+}
+
+function groupGamesPerTeam(games) {
+    let teams = {};
+    for (let i = 0; i < games.length; i++) {
+      let awayTeam = games[i]["away_team_code"];
+      let homeTeam = games[i]["home_team_code"];
+      if (!teams[awayTeam]) {
+        teams[awayTeam] = []; 
+      }
+      if(!teams[homeTeam]){
+        teams[homeTeam] = []; 
+      }
+      teams[awayTeam].push(games[i]);
+      teams[homeTeam].push(games[i]);
+    }
+    return teams;
+  }
 
 // --------------------------------------- At beginning of log entries
 function logStart() {

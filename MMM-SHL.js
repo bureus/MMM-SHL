@@ -15,11 +15,11 @@ Module.register("MMM-SHL", {
         }
     },
 
-    /*getStyles: function () {
+    getStyles: function () {
         return [
             this.file('/css/mmm-shl-main.css')
         ]
-    },*/
+    },
 
     start: function () {
         Log.info("Starting module: " + this.name);
@@ -64,16 +64,20 @@ Module.register("MMM-SHL", {
         th.className = 'align-left';
         row.appendChild(th);
         th = document.createElement("th");
-        th.className = 'align-left';
+        th.className = 'align-left stands-colum-left';
         th.innerText = "GP"
         row.appendChild(th);
         th = document.createElement("th");
-        th.className = 'align-left';
+        th.className = 'align-left stands-colum';
         th.innerText = "+/-"
         row.appendChild(th);
         th = document.createElement("th");
-        th.className = 'align-left';
+        th.className = 'align-left stands-colum';
         th.innerText = "P"
+        row.appendChild(th);
+        th = document.createElement("th");
+        th.className = 'align-left';
+        th.innerText = "Next game"
         row.appendChild(th);
         table.appendChild(row);
         for (let n = 0; n < this.stands.length; n++) {
@@ -92,16 +96,20 @@ Module.register("MMM-SHL", {
             th.innerText =  team.name;
             row.appendChild(th);
             th = document.createElement("th");
-            th.className = 'align-left';
+            th.className = 'align-left stands-colum-left';
             th.innerText =  team.gp;
             row.appendChild(th);
             th = document.createElement("th");
-            th.className = 'align-left';
+            th.className = 'align-left stands-colum';
             th.innerText =  team.diff;
             row.appendChild(th);
             th = document.createElement("th");
-            th.className = 'align-left';
+            th.className = 'align-left stands-colum';
             th.innerText =  team.points;
+            row.appendChild(th);
+            th = document.createElement("th");
+            th.className = 'align-left';
+            th.innerText =  getNextGameString(team);
             row.appendChild(th);
             table.appendChild(row);
         };
@@ -134,3 +142,10 @@ Module.register("MMM-SHL", {
         }
     }
 });
+
+function getNextGameString(team) {
+    let date = new Date(team.nextGame.start_date_time);
+    let options = { weekday: "long", day: "numeric"};
+    let playTime = date.toLocaleDateString("sv-SE", options)+" "+date.getHours()+":"+(date.getMinutes() <= 9 ? date.getMinutes()+"0" : date.getMinutes());
+    return team.team_code == team.nextGame.away_team_code ? "Borta, "+ playTime : "Hemma, "+ playTime;
+}
