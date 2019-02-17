@@ -1,9 +1,6 @@
 //English translations
 {
-  "LINE": "Line",
-  "NEXT": "Next",
-  "UPCOMING": "Thereafter",
-  "TRACK": "Track",
-  "NOW": "Now",
-  "UNDEFINED": "-"
+  "NEXTGAME": "Next game",
+  "HOMEGAME": "Home",
+  "AWAYGAME": "Away"
 }

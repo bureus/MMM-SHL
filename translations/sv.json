@@ -1,9 +1,6 @@
 ﻿//Swedish translations
 {
-  "LINE": "Linje",
-  "NEXT": "Nästa",
-  "UPCOMING": "Därefter",
-  "TRACK": "Läge",
-  "NOW": "Nu",
-  "UNDEFINED": "-"
+  "NEXTGAME": "Nästa match",
+  "HOMEGAME": "Hemma",
+  "AWAYGAME": "Borta"
 }

@@ -5,7 +5,7 @@ Module.register("MMM-SHL", {
         clientId: "",
         clientSecret: "",
         debug: false,
-        refreshRate: "60000",
+        teams: null
     },
     
     getTranslations: function () {
@@ -77,7 +77,7 @@ Module.register("MMM-SHL", {
         row.appendChild(th);
         th = document.createElement("th");
         th.className = 'align-left';
-        th.innerText = "Next game"
+        th.innerText = this.translate("NEXTGAME");
         row.appendChild(th);
         table.appendChild(row);
         for (let n = 0; n < this.stands.length; n++) {
@@ -147,5 +147,5 @@ function getNextGameString(team) {
     let date = new Date(team.nextGame.start_date_time);
     let options = { weekday: "long", day: "numeric"};
     let playTime = date.toLocaleDateString("sv-SE", options)+" "+date.getHours()+":"+(date.getMinutes() <= 9 ? date.getMinutes()+"0" : date.getMinutes());
-    return team.team_code == team.nextGame.away_team_code ? "Borta, "+ playTime : "Hemma, "+ playTime;
+    return team.team_code == team.nextGame.away_team_code ? this.translate("AWAYGAME")+", "+ playTime : this.translate("AWAYGAME")+", "+ playTime;
 }

@@ -139,6 +139,66 @@ module.exports = NodeHelper.create({
                     icon: "https://www.shl.se/team_graphics/nef_shl/dif1-dif-896f9/special/30.png",
                     name: "Djurgården"
                 };
+            case "BIF":
+                return {
+                    icon: "https://www.shl.se/team_graphics/nef_shl/bif1-bif-713a5/special/30.png",
+                    name: "Brynäs"
+                };
+            case "FBK":
+                return {
+                    icon: "https://www.shl.se/team_graphics/nef_shl/fbk1-fbk-88173/special/30.png",
+                    name: "Färjestad"
+                };
+            case "HV71":
+                return {
+                    icon: "https://www.shl.se/team_graphics/nef_shl/hv711-hv71-32ce9/special/30.png",
+                    name: "HV71"
+                };
+            case "LHC":
+                return {
+                    icon: "https://www.shl.se/team_graphics/nef_shl/lhc1-lhc-e49a6/special/30.png",
+                    name: "Linköping"
+                };
+            case "LHF":
+                return {
+                    icon: "https://www.shl.se/team_graphics/nef_shl/lhf1-lhf-cc96a/special/30.png",
+                    name: "Luleå"
+                };
+            case "MIF":
+                return {
+                    icon: "https://www.shl.se/team_graphics/nef_shl/mif1-mif-d39e4/special/30.png",
+                    name: "Malmö"
+                };
+            case "MIK":
+                return {
+                    icon: "https://www.shl.se/team_graphics/nef_shl/mik1-mik-82c5d/special/30.png",
+                    name: "Mora"
+                };
+            case "OHK":
+                return {
+                    icon: "https://www.shl.se/team_graphics/nef_shl/ohk1-ohk-0ab2b/special/30.png",
+                    name: "Örebro"
+                };
+            case "RBK":
+                return {
+                    icon: "https://www.shl.se/team_graphics/nef_shl/rbk1-rbk-539f1/special/30.png",
+                    name: "Rögle"
+                };
+            case "SAIK":
+                return {
+                    icon: "https://www.shl.se/team_graphics/nef_shl/saik1-saik-ba23a/special/30.png",
+                    name: "Skellefteå"
+                };
+            case "TIK":
+                return {
+                    icon: "https://www.shl.se/team_graphics/nef_shl/tik1-tik-9d6bb/special/30.png",
+                    name: "Timerå"
+                };
+            case "VLH":
+                return {
+                    icon: "https://www.shl.se/team_graphics/nef_shl/vlh1-vlh-8a4d0/special/30.png",
+                    name: "Växjö"
+                };
             default:
               return null;
           }
@@ -176,7 +236,7 @@ module.exports = NodeHelper.create({
         let self = this;
         let dto = [];
         self.stands.forEach(team => {
-            if(team.team_code == "FHC" || team.team_code == "DIF"){
+            if(!this.config.teams || this.config.teams.indexOf(team.team_code) > -1){
                 debug("Team is: "+team.team_code);
                 let teamContent = self.getTeamContent(team.team_code);
                 team.icon = teamContent.icon;
