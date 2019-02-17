@@ -11,8 +11,8 @@ You need to obtain your own application key and secret from SHL Open API by foll
 3. Add the module to the MagicMirror config
 
 ## Update
-1. Run ``git pull`` inside ``../modules/MMM-Vasttrafik-PublicTransport/`` folder.
-2. Run ``npm install`` inside ``../modules/MMM-Vasttrafik-PublicTransport/`` folder
+1. Run ``git pull`` inside ``../modules/MMM-SHL/`` folder.
+2. Run ``npm install`` inside ``../modules/MMM-SHL/`` folder
 
 ## Configuration
 ```
@@ -33,7 +33,7 @@ modules: [
 ]
 ```
 ### Filtered board
-If you dont want to show the complete stands table but rather filiter the board on your favorit teams. Then please use the config ```teams```. Below configuration will only show Djurgården, Frölunda and Malmö in the stands table. Team codes are listed below. 
+If you dont want to show the complete stands table but rather filiter the board on your favorit teams. Then please use the config ```teams```. Below configuration will only show Djurgården, Frölunda and Mora in the stands table. Team codes are listed below. 
 
 ```
 modules: [
