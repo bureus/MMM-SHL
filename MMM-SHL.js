@@ -109,7 +109,7 @@ Module.register("MMM-SHL", {
             row.appendChild(th);
             th = document.createElement("th");
             th.className = 'align-left';
-            th.innerText =  getNextGameString(team);
+            th.innerText =  this.getNextGameString(team);
             row.appendChild(th);
             table.appendChild(row);
         };
@@ -140,12 +140,11 @@ Module.register("MMM-SHL", {
         if (notification == "DOM_OBJECTS_CREATED") {
             this.domObjectCreated = true;
         }
+    },
+    getNextGameString: function(team) {
+        let date = new Date(team.nextGame.start_date_time);
+        let options = { weekday: "long", day: "numeric"};
+        let playTime = date.toLocaleDateString("sv-SE", options)+" "+date.getHours()+":"+(date.getMinutes() <= 9 ? date.getMinutes()+"0" : date.getMinutes());
+        return team.team_code == team.nextGame.away_team_code ? this.translate("AWAYGAME")+", "+ playTime : this.translate("HOMEGAME")+", "+ playTime;
     }
 });
-
-function getNextGameString(team) {
-    let date = new Date(team.nextGame.start_date_time);
-    let options = { weekday: "long", day: "numeric"};
-    let playTime = date.toLocaleDateString("sv-SE", options)+" "+date.getHours()+":"+(date.getMinutes() <= 9 ? date.getMinutes()+"0" : date.getMinutes());
-    return team.team_code == team.nextGame.away_team_code ? this.translate("AWAYGAME")+", "+ playTime : this.translate("AWAYGAME")+", "+ playTime;
-}
