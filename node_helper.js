@@ -16,7 +16,7 @@ module.exports = NodeHelper.create({
         let self = this;
         log("Sceduled refresh at: "+new Date(Date.now()+refreshRate));
         this.updatetimer = setInterval(function () { // This timer is saved in uitimer so that we can cancel it
-            self.sendStand();
+            self.update();
         }, refreshRate);
     },
     // --------------------------------------- Get access token
