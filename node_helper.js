@@ -40,7 +40,7 @@ module.exports = NodeHelper.create({
                     debug("access token response: "+body);
                     self.accessToken = {
                         token: reply.access_token,
-                        expires: reply.expires_in
+                        expires: new Date(Date.now()+3600000)
                     }
                     debug("generateAccessToken completed");
                     resolve(true);
@@ -219,7 +219,7 @@ module.exports = NodeHelper.create({
         if(this.updatetimer){
             clearInterval(this.updatetimer); 
         }
-        if(!self.accessToken){
+        if(!self.accessToken || self.accessToken.expires < Date.now()){
             self.accessToken = await self.getAccessToken();
             if(self.accessToken)
                 debug("Access token retrived: "+self.accessToken);
