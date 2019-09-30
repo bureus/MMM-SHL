@@ -23,6 +23,7 @@ modules: [
             position: "bottom_left",
 
             config: {
+                showUpdated: "false", //Optional, default true, shows updated time below table
                 clientId: "clientID", //Required, your own API client id
                 clientSecret: "secret", //Required, your own API client secret
                 teams: ['teamId'] //Optional, lets you filter out specific 

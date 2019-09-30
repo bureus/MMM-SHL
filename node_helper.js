@@ -239,7 +239,7 @@ module.exports = NodeHelper.create({
     let self = this;
     let dto = await self.generateDto();
     debug(JSON.stringify(dto));
-    if (dto.length > 0) {
+    if (dto.sortedStand.length > 0) {
       self.sendSocketNotification("STANDS", dto); // send teams stands back to app.
     } else {
       self.sendSocketNotification("SERVICE_FAILURE", "Missing teams..");
@@ -288,7 +288,10 @@ module.exports = NodeHelper.create({
     });
     debug(JSON.stringify(dto));
     let sortedStands = sortByKey(dto, "rank");
-    return sortedStands;
+    return {
+        sortedStand: sortedStands,
+        updated: Date.now()
+    };
   },
   // --------------------------------------- Handle notifications
   socketNotificationReceived: async function(notification, payload) {
