@@ -1,6 +1,7 @@
 const NodeHelper = require("node_helper");
 const request = require("request-promise");
 const encode = require("nodejs-base64-encode");
+
 const baseUrl = "https://openapi.shl.se";
 var Url = require("url");
 var debugMe = true;
@@ -14,7 +15,8 @@ module.exports = NodeHelper.create({
   // --------------------------------------- Schedule a stands update
   scheduleUpdate: function(refreshRate) {
     let self = this;
-    log("Sceduled refresh at: " + new Date(Date.now() + refreshRate));
+    self.estimatedRefreshTime = new Date(Date.now() + refreshRate);
+    log("Sceduled refresh at: " + self.estimatedRefreshTime.toLocaleTimeString());
     this.updatetimer = setInterval(function() {
       // This timer is saved in uitimer so that we can cancel it
       self.update();
@@ -252,9 +254,10 @@ module.exports = NodeHelper.create({
       clearInterval(this.updatetimer);
     }
     if (!self.accessToken || self.accessToken.expires < Date.now()) {
-      self.accessToken = await self.getAccessToken();
+      await self.getAccessToken();
       if (self.accessToken) debug("Access token retrived: " + self.accessToken);
     }
+    
     self.games = await self.getGames();
     self.gamePerTeam = groupGamesPerTeam(self.games);
     self.stands = await self.getStands();
@@ -288,9 +291,14 @@ module.exports = NodeHelper.create({
     });
     debug(JSON.stringify(dto));
     let sortedStands = sortByKey(dto, "rank");
+    let timeToNextUpdate = getRefreshTime(
+      sortOnUpcomingGame(new Date(Date.now()), self.games)[0]
+    );
+    let nextUpdate = new Date(Date.now() + timeToNextUpdate);
     return {
         sortedStand: sortedStands,
-        updated: Date.now()
+        updated: Date.now(),
+        nextUpdate: nextUpdate
     };
   },
   // --------------------------------------- Handle notifications

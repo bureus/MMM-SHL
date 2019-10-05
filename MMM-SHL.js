@@ -45,12 +45,12 @@ Module.register("MMM-SHL", {
     if (this.stands.length > 0) {
       let standsTable = this.generateStandsTable();
       let updated = document.createElement("span");
-      let html = standsTable
+      let html = standsTable;
       if (this.config.showUpdated) {
         updated.className = "xsmall";
         updated.style = "opacity: 0.222222;";
         updated.innerText =
-          this.translate("UPDATED") + this.updated.toLocaleString();
+          this.translate("UPDATED") + this.updated.toLocaleString() + this.translate("NEXTUPDATE")+this.nextUpdate.toLocaleString()+")";
         html = html + updated.outerHTML;
       }
       wrapper.innerHTML = html;
@@ -135,6 +135,7 @@ Module.register("MMM-SHL", {
       this.failure = undefined;
       // Handle payload
       this.stands = payload.sortedStand;
+      this.nextUpdate = payload.nextUpdate;
       this.updated = new Date(payload.updated);
       this.updateDom();
     } else if (notification == "SERVICE_FAILURE") {

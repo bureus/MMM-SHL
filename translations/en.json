@@ -1,7 +1,7 @@
-//English translations
 {
   "NEXTGAME": "Next game",
   "HOMEGAME": "Home",
   "AWAYGAME": "Away",
-  "UPDATED": "Updated: "
+  "UPDATED": "Updated: ",
+  "NEXTUPDATE": "(Updating at: "
 }
