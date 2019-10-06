@@ -253,10 +253,7 @@ module.exports = NodeHelper.create({
     if (this.updatetimer) {
       clearInterval(this.updatetimer);
     }
-    if (!self.accessToken || self.accessToken.expires < Date.now()) {
-      await self.getAccessToken();
-      if (self.accessToken) debug("Access token retrived: " + self.accessToken);
-    }
+    await self.getAccessToken();
     
     self.games = await self.getGames();
     self.gamePerTeam = groupGamesPerTeam(self.games);

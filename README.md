@@ -72,9 +72,10 @@ modules: [
 | Skellefteå | SAIK      |
 | Timerå | TIK      |
 | Växjö | VLH      |
+| Oskarshamn | IKO      |
+| Leksand | LIF      |
 
 
 ## Screenshot
 
 ![SHL Module](https://github.com/bureus/MMM-SHL/blob/master/docs/screenshot.PNG)
-
